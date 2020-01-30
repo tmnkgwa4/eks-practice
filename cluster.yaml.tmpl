@@ -1,0 +1,69 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: [クラスター名] # クラスター名称 適宜決定する
+  region: ap-northeast-1
+  version: "1.14"
+
+vpc:
+  id: "[VPC ID]" # 作成対象の既存 VPC の ID
+  cidr: "[VPC CIDR]" # VPC で設定した CIDR
+  subnets:
+    private:
+      ap-northeast-1a:
+        id: "[サブネットID]" # VPC に作成したサブネット ID
+      ap-northeast-1c:
+        id: "[サブネットID]" # VPC に作成したサブネット ID
+      ap-northeast-1d:
+        id: "[サブネットID]" # VPC に作成したサブネット ID
+    public:
+      ap-northeast-1a:
+        id: "[サブネットID]" # VPC に作成したサブネット ID
+      ap-northeast-1c:
+        id: "[サブネットID]" # VPC に作成したサブネット ID
+      ap-northeast-1d:
+        id: "[サブネットID]" # VPC に作成したサブネット ID
+
+nodeGroups:
+  - name: [ノードグループ名] # ノードグループ名 クラスター内で一意になる文字列
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 5
+    instancesDistribution:
+      maxPrice: 0.04
+      instanceTypes:
+        - t2.large
+        - t2.xlarge
+      onDemandBaseCapacity: 0
+      onDemandPercentageAboveBaseCapacity: 0
+      spotInstancePools: 4
+    availabilityZones:
+      - ap-northeast-1a
+      - ap-northeast-1c
+      - ap-northeast-1d
+    volumeSize: 30
+    privateNetworking: true
+    ssh:
+      allow: true
+      publicKeyName: [KEYPAIR] # ノードに接続する sshkey
+    securityGroups:
+      attachIDs:
+        - sg-053ffab8f4f521196
+        - [セキュリティグループ ID] # ノードにアタッチされるやつ
+    targetGroupARNs:
+      - [ALB ターゲットグループ ARN] # クラスタにアタッチする ALB ターゲットグループ
+      - [ALB ターゲットグループ ARN] # クラスタにアタッチする ALB ターゲットグループ
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        autoScaler: true
+        efs: true
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+
+cloudWatch:
+    clusterLogging:
+        enableTypes: ["all"]
