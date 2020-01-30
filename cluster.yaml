@@ -1,0 +1,54 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: tmnakagawa-sandbox-tranfis-cluster-1
+  region: ap-northeast-1
+
+nodeGroups:
+  - name: tmnakagawa-sandbox-nodegroup-1
+    privateNetworking: true
+    minSize: 2
+    maxSize: 5
+    instancesDistribution:
+      maxPrice: 1
+      instanceTypes: ["t2.large", "t2.xlarge"]
+      onDemandBaseCapacity: 0
+      onDemandPercentageAboveBaseCapacity: 50
+      spotInstancePools: 2
+    ssh:
+     allow: true
+     publicKeyName: TomoakiNakagawa
+    securityGroups:
+      attachIDs: [sg-0e40d84b4fcb2ad62]
+    privateNetworking: true
+    iam:
+      attachPolicyARNs:
+      - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      - arn:aws:iam::aws:policy/CloudFrontFullAccess
+      - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+      - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+      withAddonPolicies:
+        autoScaler: true
+        ebs: true
+        albIngress: true
+        fsx: true
+        efs: true
+
+vpc:
+  id: "vpc-043d78ac85e27e919"
+  cidr: "172.31.0.0/16"
+  subnets:
+    private:
+      ap-northeast-1a:
+        id: "subnet-01829b285d2b6a412"
+
+      ap-northeast-1c:
+        id: "subnet-0d89cbd92a526427d"
+
+      ap-northeast-1d:
+        id: "subnet-06629715e4d38fcf3"
+
+cloudWatch:
+    clusterLogging:
+        enableTypes: ["all"]
